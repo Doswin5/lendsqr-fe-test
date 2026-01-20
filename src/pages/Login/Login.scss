@@ -1,0 +1,139 @@
+@use "../../styles/variables" as *;
+
+.login {
+  min-height: 100vh;
+  background: #fff;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.login__left {
+  padding: 80px 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+}
+
+.login__logo {
+  width: 140px;
+  height: auto;
+}
+
+.login__illustrationWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.login__illustration {
+  max-width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.login__right {
+  padding: 80px 90px;
+  display: flex;
+  align-items: center;
+}
+
+.login__card {
+  width: 100%;
+  max-width: 447px;
+}
+
+.login__title {
+  font-size: 40px;
+  line-height: 1.2;
+  font-weight: $fw-bold;
+  color: $secondary-color;
+  margin-bottom: 10px;
+}
+
+.login__subtitle {
+  font-size: 20px;
+  color: $text-color;
+  margin-bottom: 50px;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.login__input {
+  height: 50px;
+  width: 100%;
+  padding: 0 16px;
+  border-radius: $radius-input;
+  border: 2px solid $border-color;
+  font-size: 14px;
+  color: $secondary-color;
+  background: #fff;
+
+  &::placeholder {
+    color: rgba(84, 95, 125, 0.7);
+  }
+
+  &:focus {
+    border-color: rgba(57, 205, 204, 0.7);
+  }
+}
+
+.login__password {
+  position: relative;
+
+  .login__input {
+    padding-right: 70px;
+  }
+}
+
+.login__toggle {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  font-size: 12px;
+  font-weight: $fw-semibold;
+  letter-spacing: 0.08em;
+  color: $primary-color;
+  cursor: pointer;
+}
+
+.login__forgot {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: $fw-semibold;
+  letter-spacing: 0.08em;
+  color: $primary-color;
+  cursor: pointer;
+}
+
+.login__btn {
+  height: 50px;
+  border-radius: $radius-button;
+  background: $primary-color;
+  color: #fff;
+  font-weight: $fw-semibold;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .login {
+    grid-template-columns: 1fr;
+  }
+
+  .login__left {
+    padding: 40px 24px;
+    gap: 30px;
+  }
+
+  .login__right {
+    padding: 24px 24px 60px;
+  }
+
+  .login__card {
+    max-width: 520px;
+  }
+}
