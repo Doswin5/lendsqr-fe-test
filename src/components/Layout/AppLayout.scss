@@ -1,0 +1,164 @@
+@use "../../styles/variables" as *;
+
+.app {
+  min-height: 100vh;
+  background: $background-color;
+}
+
+.app__topbar {
+  height: 100px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app__logo {
+  height: 30px;
+  width: auto;
+}
+
+.app__search {
+  display: flex;
+  align-items: center;
+  width: 400px;
+}
+
+.app__searchInput {
+  height: 40px;
+  width: 100%;
+  border: 1px solid rgba(33, 63, 125, 0.2);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.app__searchBtn {
+  height: 40px;
+  width: 56px;
+  border-radius: 0 8px 8px 0;
+  background: $primary-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  img {
+    height: 14px;
+    width: 14px;
+  }
+}
+
+.app__topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.app__docs {
+  color: $secondary-color;
+  text-decoration: underline;
+  font-size: 16px;
+}
+
+.app__iconBtn {
+  cursor: pointer;
+}
+
+.app__profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.app__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.app__name {
+  color: $secondary-color;
+  font-size: 16px;
+}
+
+.app__caret {
+  width: 12px;
+  height: 12px;
+}
+
+.app__body {
+  display: grid;
+  grid-template-columns: 283px 1fr;
+  height: calc(100vh - 100px);
+}
+
+.app__sidebar {
+  background: #fff;
+  padding: 40px 0;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+  min-height: calc(100vh - 100px);
+  overflow-y: auto;
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* IE / Edge */
+  -ms-overflow-style: none;
+}
+
+.app__sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.app__org {
+  width: 100%;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $secondary-color;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.app__nav {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app__navSection {
+  margin: 20px 0 6px;
+  padding: 0 30px;
+  font-size: 12px;
+  color: rgba(33, 63, 125, 0.6);
+}
+
+.app__navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 30px;
+  color: rgba(33, 63, 125, 0.6);
+  text-decoration: none;
+  font-size: 16px;
+
+  &.is-active {
+    color: $secondary-color;
+    background: rgba(57, 205, 204, 0.06);
+    border-left: 3px solid $primary-color;
+  }
+}
+
+.app__content {
+  padding: 60px;
+}
