@@ -89,16 +89,30 @@
   }
 }
 
+.login__passwordRow {
+  position: relative;
+}
+
 .login__toggle {
   position: absolute;
   right: 16px;
-  top: 14px;
+  top: 0;
+  height: 50px; // match input height exactly
+  display: flex;
+  align-items: center;
+
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 1;
+
   font-size: 12px;
   font-weight: $fw-semibold;
   letter-spacing: 0.08em;
   color: $primary-color;
   cursor: pointer;
 }
+
 
 .login__forgot {
   align-self: flex-start;
@@ -118,6 +132,31 @@
   letter-spacing: 0.08em;
   cursor: pointer;
 }
+
+.login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login__error {
+  font-size: 12px;
+  color: #e43b3b;
+}
+
+.login__input.is-error {
+  border-color: rgba(228, 59, 59, 0.7);
+}
+
+.login__input.is-error:focus {
+  border-color: rgba(228, 59, 59, 0.7);
+}
+
+.login__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 
 @media (max-width: 960px) {
   .login {
