@@ -24,10 +24,25 @@
   border-radius: 4px;
   padding: 20px 30px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+.users__statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+}
+
+
 .users__statLabel {
-  font-size: 14px;
+  font-size: 13px;
   color: $text-color;
   margin-bottom: 12px;
 }
@@ -81,6 +96,15 @@
 .users__actions {
   text-align: right;
   cursor: pointer;
+  color: rgba(84, 95, 125, 0.6);
+  position: relative;
+}
+
+.users__actionsBtn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 18px;
   color: rgba(84, 95, 125, 0.6);
 }
 
