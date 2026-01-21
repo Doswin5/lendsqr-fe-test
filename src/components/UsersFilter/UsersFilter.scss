@@ -1,0 +1,60 @@
+@use "../../styles/variables" as *;
+
+.usersFilter {
+  position: absolute;
+  top: 40px;
+  left: -10px;
+  right: auto;
+  width: 270px;
+  background: #fff;
+  border-radius: 4px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+
+.usersFilter__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+
+  label {
+    font-size: 14px;
+    color: $text-color;
+  }
+
+  input,
+  select {
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(84, 95, 125, 0.15);
+    font-size: 14px;
+  }
+}
+
+.usersFilter__actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.usersFilter__reset {
+  height: 40px;
+  padding: 0 28px;
+  border-radius: 8px;
+  border: 1px solid $secondary-color;
+  background: #fff;
+  color: $secondary-color;
+  cursor: pointer;
+}
+
+.usersFilter__apply {
+  height: 40px;
+  padding: 0 28px;
+  border-radius: 8px;
+  background: $primary-color;
+  color: #fff;
+  cursor: pointer;
+}
