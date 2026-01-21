@@ -1,6 +1,38 @@
 import { Outlet, NavLink } from "react-router-dom";
 import "./AppLayout.scss";
 
+type SideItemProps = {
+  to: string;
+  icon: string;
+  label: string;
+  exact?: boolean;
+};
+
+const SideItem = ({ to, icon, label }: SideItemProps) => {
+  const isRealRoute = to.startsWith("/");
+
+  if (!isRealRoute) {
+    return (
+      <a className="app__navItem" href="#" onClick={(e) => e.preventDefault()}>
+        <img src={icon} alt="" />
+        <span>{label}</span>
+      </a>
+    );
+  }
+
+  return (
+    <NavLink
+      className={({ isActive }) =>
+        `app__navItem ${isActive ? "is-active" : ""}`
+      }
+      to={to}
+    >
+      <img src={icon} alt="" />
+      <span>{label}</span>
+    </NavLink>
+  );
+};
+
 const AppLayout = () => {
   return (
     <div className="app">
@@ -49,62 +81,91 @@ const AppLayout = () => {
           </button>
 
           <nav className="app__nav">
-            <NavLink
-              className={({ isActive }) =>
-                `app__navItem ${isActive ? "is-active" : ""}`
-              }
+            <SideItem
               to="/dashboard"
-            >
-              <img src="/dashboard-icon.svg" alt="" />
-              <span>Dashboard</span>
-            </NavLink>
+              icon="/dashboard-icon.svg"
+              label="Dashboard"
+            />
 
             <p className="app__navSection">CUSTOMERS</p>
 
-            <NavLink
-              className={({ isActive }) =>
-                `app__navItem ${isActive ? "is-active" : ""}`
-              }
-              to="/users"
-            >
-              <img src="/users-icon.svg" alt="" />
-              <span>Users</span>
-            </NavLink>
+            <SideItem to="/users" icon="/users-icon.svg" label="Users" />
+            <SideItem to="__" icon="/guarantor-icon.svg" label="Guarantors" />
+            <SideItem to="__" icon="/loan-icon.svg" label="Loans" />
+            <SideItem
+              to="__"
+              icon="/decision-icon.svg"
+              label="Decision Models"
+            />
+            <SideItem to="__" icon="/saving-icon.svg" label="Savings" />
+            <SideItem
+              to="__"
+              icon="/loanrequest-icon.svg"
+              label="Loan Requests"
+            />
+            <SideItem to="__" icon="/whitelist-icon.svg" label="Whitelist" />
+            <SideItem to="__" icon="/karma-icon.svg" label="Karma" />
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/guarantor-icon.svg" alt="" />
-              <span>Guarantors</span>
-            </NavLink>
+            <p className="app__navSection">BUSINESSES</p>
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/loan-icon.svg" alt="" />
-              <span>Loans</span>
-            </NavLink>
+            <SideItem
+              to="__"
+              icon="/organization-icon.svg"
+              label="Organization"
+            />
+            <SideItem
+              to="__"
+              icon="/loanproducts-icon.svg"
+              label="Loan Products"
+            />
+            <SideItem
+              to="__"
+              icon="/savingsproducts-icon.svg"
+              label="Savings Products"
+            />
+            <SideItem to="__" icon="/fees-icon.svg" label="Fees and Charges" />
+            <SideItem
+              to="__"
+              icon="/transactions-icon.svg"
+              label="Transactions"
+            />
+            <SideItem to="__" icon="/services-icon.svg" label="Services" />
+            <SideItem
+              to="__"
+              icon="/serviceaccount-icon.svg"
+              label="Service Account"
+            />
+            <SideItem
+              to="__"
+              icon="/settlements-icon.svg"
+              label="Settlements"
+            />
+            <SideItem to="__" icon="/reports-icon.svg" label="Reports" />
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/decision-icon.svg" alt="" />
-              <span>Decision Models</span>
-            </NavLink>
+            <p className="app__navSection">SETTINGS</p>
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/saving-icon.svg" alt="" />
-              <span>Savings</span>
-            </NavLink>
+            <SideItem
+              to="__"
+              icon="/preferences-icon.svg"
+              label="Preferences"
+            />
+            <SideItem
+              to="__"
+              icon="/feespricing-icon.svg"
+              label="Fees and Pricing"
+            />
+            <SideItem to="__" icon="/auditlogs-icon.svg" label="Audit Logs" />
+            <SideItem
+              to="__"
+              icon="/systemmessages-icon.svg"
+              label="System Messages"
+            />
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/loanrequest-icon.svg" alt="" />
-              <span>Loan Requests</span>
-            </NavLink>
+            <div className="app__navDivider" />
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/whitelist-icon.svg" alt="" />
-              <span>Whitelist</span>
-            </NavLink>
+            <SideItem to="__" icon="/logout-icon.svg" label="Logout" />
 
-            <NavLink className="app__navItem" to="#">
-              <img src="/karma-icon.svg" alt="" />
-              <span>Karma</span>
-            </NavLink>
+            <p className="app__version">v1.2.0</p>
           </nav>
         </aside>
 

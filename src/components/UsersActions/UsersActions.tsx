@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UsersActions.scss";
 
@@ -8,27 +7,31 @@ type Props = {
 };
 
 const UsersActions = ({ userId, onClose }: Props) => {
-  const ref = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [onClose]);
-
   return (
-    <div className="usersActions" ref={ref}>
-      <button onClick={() => navigate(`/users/${userId}`)}>
+    <div className="usersActions" onMouseDown={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={() => {
+          navigate(`/users/${userId}`);
+          onClose();
+        }}
+      >
+        <img src="/action-icon.svg" alt="" />
         View Details
       </button>
-      <button>Blacklist User</button>
-      <button>Activate User</button>
+
+      <button type="button" onMouseDown={(e) => e.stopPropagation()}>
+        <img src="/action2-icon.svg" alt="" />
+        Blacklist User
+      </button>
+
+      <button type="button" onMouseDown={(e) => e.stopPropagation()}>
+        <img src="/action3-icon.svg" alt="" />
+        Activate User
+      </button>
     </div>
   );
 };

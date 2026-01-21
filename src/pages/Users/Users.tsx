@@ -41,7 +41,7 @@ const Users = () => {
   }, []);
 
   return (
-    <div className="users">
+    <div className="users" onMouseDown={() => setOpenAction(null)}>
       <h1 className="users__title">Users</h1>
 
       <div className="users__stats">
@@ -162,19 +162,21 @@ const Users = () => {
                   <button
                     className="users__actionsBtn"
                     type="button"
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={() =>
-                      setOpenAction(openAction === "1" ? null : "1")
-                    }
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setOpenAction(openAction === "1" ? null : "1");
+                    }}
                   >
                     ⋮
                   </button>
 
                   {openAction === "1" && (
-                    <UsersActions
-                      userId="1"
-                      onClose={() => setOpenAction(null)}
-                    />
+                    <div onMouseDown={(e) => e.stopPropagation()}>
+                      <UsersActions
+                        userId={"1"}
+                        onClose={() => setOpenAction(null)}
+                      />
+                    </div>
                   )}
                 </div>
               </td>
@@ -194,19 +196,21 @@ const Users = () => {
                   <button
                     className="users__actionsBtn"
                     type="button"
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={() =>
-                      setOpenAction(openAction === "2" ? null : "2")
-                    }
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setOpenAction(openAction === "2" ? null : "2");
+                    }}
                   >
                     ⋮
                   </button>
 
                   {openAction === "2" && (
-                    <UsersActions
-                      userId="2"
-                      onClose={() => setOpenAction(null)}
-                    />
+                    <div onMouseDown={(e) => e.stopPropagation()}>
+                      <UsersActions
+                        userId={"2"}
+                        onClose={() => setOpenAction(null)}
+                      />
+                    </div>
                   )}
                 </div>
               </td>
@@ -226,19 +230,21 @@ const Users = () => {
                   <button
                     className="users__actionsBtn"
                     type="button"
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={() =>
-                      setOpenAction(openAction === "3" ? null : "3")
-                    }
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setOpenAction(openAction === "3" ? null : "3");
+                    }}
                   >
                     ⋮
                   </button>
 
                   {openAction === "3" && (
-                    <UsersActions
-                      userId="3"
-                      onClose={() => setOpenAction(null)}
-                    />
+                    <div onMouseDown={(e) => e.stopPropagation()}>
+                      <UsersActions
+                        userId={"3"}
+                        onClose={() => setOpenAction(null)}
+                      />
+                    </div>
                   )}
                 </div>
               </td>
@@ -258,19 +264,21 @@ const Users = () => {
                   <button
                     className="users__actionsBtn"
                     type="button"
-                    onMouseDown={(e) => e.stopPropagation()}
-                    onClick={() =>
-                      setOpenAction(openAction === "4" ? null : "4")
-                    }
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setOpenAction(openAction === "4" ? null : "4");
+                    }}
                   >
                     ⋮
                   </button>
 
                   {openAction === "4" && (
-                    <UsersActions
-                      userId="4"
-                      onClose={() => setOpenAction(null)}
-                    />
+                    <div onMouseDown={(e) => e.stopPropagation()}>
+                      <UsersActions
+                        userId={"4"}
+                        onClose={() => setOpenAction(null)}
+                      />
+                    </div>
                   )}
                 </div>
               </td>

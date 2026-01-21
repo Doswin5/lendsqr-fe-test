@@ -20,6 +20,9 @@
     font-size: 14px;
     color: $secondary-color;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
     &:hover {
       background: rgba(33, 63, 125, 0.05);
