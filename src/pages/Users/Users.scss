@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
-  height: 1000px;
+  min-height: 100vh;
 }
 
 .users__title {
@@ -61,10 +61,12 @@
   border-radius: 4px;
   padding: 30px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .users__table {
-  width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
 
   th {
@@ -147,4 +149,42 @@
 .status--blacklisted {
   color: #e4033b;
   background: rgba(228, 59, 59, 0.1);
+}
+
+
+@media (max-width: 1024px) {
+  .users__stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .users__tableWrap {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .users {
+    gap: 24px;
+  }
+
+  .users__title {
+    font-size: 20px;
+  }
+
+  .users__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .users__stat {
+    padding: 16px;
+  }
+
+  .users__tableWrap {
+    padding: 16px;
+  }
+
+  .users__statValue {
+    font-size: 20px;
+  }
 }

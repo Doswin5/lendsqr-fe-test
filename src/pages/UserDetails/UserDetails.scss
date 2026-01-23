@@ -235,6 +235,13 @@
   font-size: 14px;
 }
 
+.ud__guarantorBlock {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(33, 63, 125, 0.1);
+}
+
+
 @media (max-width: 1100px) {
   .ud__grid {
     grid-template-columns: repeat(2, 1fr);

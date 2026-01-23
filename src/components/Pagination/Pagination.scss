@@ -5,6 +5,13 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination__left,
+.pagination__right {
+  flex: 1 1 auto;
 }
 
 .pagination__left {
@@ -70,3 +77,26 @@
   color: rgba(84, 95, 125, 0.7);
   padding: 0 4px;
 }
+
+@media (max-width: 640px) {
+  .pagination {
+    align-items: flex-start;
+  }
+
+  .pagination__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .pagination__pages {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 70vw;
+    padding-bottom: 4px;
+  }
+
+  .pagination__btn {
+    white-space: nowrap;
+  }
+}
+

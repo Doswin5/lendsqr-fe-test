@@ -1,14 +1,9 @@
-import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./UserDetails.scss";
+import { useUser } from "../../hooks/useUser";
 
-type TabKey =
-  | "general"
-  | "documents"
-  | "bank"
-  | "loans"
-  | "savings"
-  | "app";
+type TabKey = "general" | "documents" | "bank" | "loans" | "savings" | "app";
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: "general", label: "General Details" },
@@ -19,61 +14,40 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: "app", label: "App and System" },
 ];
 
-const UserDetails = () => {
-  const { id } = useParams();
-  const [activeTab, setActiveTab] = useState<TabKey>("general");
+const formatMoney = (amount?: string) => {
+  const n = Number(amount ?? 0);
+  return `₦${n.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
+};
 
-  // Static mock. Replace later with API data.
-  const user = useMemo(
-    () => ({
-      id: id ?? "LSQFf587g90",
-      fullName: "Grace Effiom",
-      avatar: "/user-avatar.svg", // optional; use your own asset or leave empty
-      tier: 1, // 0-3
-      balance: "₦200,000.00",
-      bank: "Providus Bank",
-      accountNo: "9912345678",
-      personal: {
-        fullName: "Grace Effiom",
-        phone: "07060780922",
-        email: "grace@gmail.com",
-        bvn: "07060780922",
-        gender: "Female",
-        maritalStatus: "Single",
-        children: "None",
-        residence: "Parent’s Apartment",
-      },
-      education: {
-        level: "B.Sc",
-        employment: "Employed",
-        sector: "FinTech",
-        duration: "2 years",
-        officeEmail: "grace@lendstar.com",
-        monthlyIncome: "₦200,000.00 - ₦400,000.00",
-        loanRepayment: "40,000",
-      },
-      socials: {
-        twitter: "@grace_effiom",
-        facebook: "Grace Effiom",
-        instagram: "@grace.effiom",
-      },
-      guarantor: {
-        fullName: "Debby Ogana",
-        phone: "08160780928",
-        email: "debby2@irorun.com",
-        relationship: "Sister",
-      },
-    }),
-    [id]
+const formatRange = (range?: string[]) => {
+  if (!range || range.length < 2) return "—";
+  const [min, max] = range;
+  return `${formatMoney(min)} - ${formatMoney(max)}`;
+};
+
+const UserDetails = () => {
+  const [activeTab, setActiveTab] = useState<TabKey>("general");
+  const { user, loading, error, blacklist, activate } = useUser();
+
+  if (loading) return <div className="userDetails">Loading...</div>;
+  if (error) return <div className="userDetails">{error}</div>;
+  if (!user) return <div className="userDetails">User not found</div>;
+
+  const renderStars = (tier: number) => (
+    <div className="ud__stars">
+      {[0, 1, 2].map((i) => (
+        <img
+          key={i}
+          src={i < tier ? "/star-icon.svg" : "/star2-icon.svg"}
+          alt=""
+        />
+      ))}
+    </div>
   );
 
-  const renderStars = (tier: number) => {
-    const stars = [0, 1, 2].map((i) => (
-      <img key={i} src={i < tier ? "/star-icon.svg" : "/star2-icon.svg"} alt="" />
-       
-    ));
-    return <div className="ud__stars">{stars}</div>;
-  };
+  const fullName = `${user.profile?.firstName ?? ""} ${
+    user.profile?.lastName ?? ""
+  }`.trim();
 
   return (
     <div className="ud">
@@ -85,10 +59,18 @@ const UserDetails = () => {
         <h1 className="ud__title">User Details</h1>
 
         <div className="ud__headerActions">
-          <button className="ud__btn ud__btn--danger" type="button">
+          <button
+            className="ud__btn ud__btn--danger"
+            type="button"
+            onClick={blacklist}
+          >
             BLACKLIST USER
           </button>
-          <button className="ud__btn ud__btn--primary" type="button">
+          <button
+            className="ud__btn ud__btn--primary"
+            type="button"
+            onClick={activate}
+          >
             ACTIVATE USER
           </button>
         </div>
@@ -97,12 +79,15 @@ const UserDetails = () => {
       <div className="ud__card">
         <div className="ud__summary">
           <div className="ud__avatar">
-            {/* If you don’t have an avatar asset, keep the circle + icon */}
-            <img src="/avatar-icon.svg" alt="" />
+            {user.profile?.avatar ? (
+              <img src={user.profile.avatar} alt="" />
+            ) : (
+              <img src="/avatar-icon.svg" alt="" />
+            )}
           </div>
 
           <div className="ud__summaryMain">
-            <p className="ud__name">{user.fullName}</p>
+            <p className="ud__name">{fullName || user.userName}</p>
             <p className="ud__userId">{user.id}</p>
           </div>
 
@@ -110,16 +95,14 @@ const UserDetails = () => {
 
           <div className="ud__summaryTier">
             <p className="ud__label">User’s Tier</p>
-            {renderStars(user.tier)}
+            {renderStars(2)}
           </div>
 
           <div className="ud__divider" />
 
           <div className="ud__summaryMoney">
-            <p className="ud__balance">{user.balance}</p>
-            <p className="ud__account">
-              {user.accountNo}/{user.bank}
-            </p>
+            <p className="ud__balance">{formatMoney(user.accountBalance)}</p>
+            <p className="ud__account">{user.accountNumber}/{user.bank ?? "Providus Bank"}</p>
           </div>
         </div>
 
@@ -128,9 +111,7 @@ const UserDetails = () => {
             <button
               key={t.key}
               type="button"
-              className={
-                activeTab === t.key ? "ud__tab is-active" : "ud__tab"
-              }
+              className={activeTab === t.key ? "ud__tab is-active" : "ud__tab"}
               onClick={() => setActiveTab(t.key)}
             >
               {t.label}
@@ -141,156 +122,169 @@ const UserDetails = () => {
 
       {activeTab === "general" ? (
         <div className="ud__details">
+          {/* Personal Information */}
           <section className="ud__section">
             <h2 className="ud__sectionTitle">Personal Information</h2>
 
             <div className="ud__grid">
               <div className="ud__item">
                 <p className="ud__itemLabel">FULL NAME</p>
-                <p className="ud__itemValue">{user.personal.fullName}</p>
+                <p className="ud__itemValue">{fullName || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">PHONE NUMBER</p>
-                <p className="ud__itemValue">{user.personal.phone}</p>
+                <p className="ud__itemValue">
+                  {user.profile?.phoneNumber || "—"}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">EMAIL ADDRESS</p>
-                <p className="ud__itemValue">{user.personal.email}</p>
+                <p className="ud__itemValue">{user.email || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">BVN</p>
-                <p className="ud__itemValue">{user.personal.bvn}</p>
+                <p className="ud__itemValue">{user.profile?.bvn || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">GENDER</p>
-                <p className="ud__itemValue">{user.personal.gender}</p>
+                <p className="ud__itemValue">{user.profile?.gender || "—"}</p>
               </div>
 
+              {/* Your JSON doesn’t have these yet. Keep as placeholders or remove */}
               <div className="ud__item">
                 <p className="ud__itemLabel">MARITAL STATUS</p>
-                <p className="ud__itemValue">{user.personal.maritalStatus}</p>
+                <p className="ud__itemValue">
+                  {user.profile?.maritalStatus || "—"}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">CHILDREN</p>
-                <p className="ud__itemValue">{user.personal.children}</p>
+                <p className="ud__itemValue">{user.profile?.children || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">TYPE OF RESIDENCE</p>
-                <p className="ud__itemValue">{user.personal.residence}</p>
+                <p className="ud__itemValue">
+                  {user.profile?.residence || "—"}
+                </p>
               </div>
             </div>
           </section>
 
+          {/* Education and Employment */}
           <section className="ud__section">
             <h2 className="ud__sectionTitle">Education and Employment</h2>
 
             <div className="ud__grid ud__grid--4">
               <div className="ud__item">
                 <p className="ud__itemLabel">LEVEL OF EDUCATION</p>
-                <p className="ud__itemValue">{user.education.level}</p>
+                <p className="ud__itemValue">{user.education?.level || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">EMPLOYMENT STATUS</p>
-                <p className="ud__itemValue">{user.education.employment}</p>
+                <p className="ud__itemValue">
+                  {user.education?.employmentStatus || "—"}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">SECTOR OF EMPLOYMENT</p>
-                <p className="ud__itemValue">{user.education.sector}</p>
+                <p className="ud__itemValue">{user.education?.sector || "—"}</p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">DURATION OF EMPLOYMENT</p>
-                <p className="ud__itemValue">{user.education.duration}</p>
+                <p className="ud__itemValue">
+                  {user.education?.duration || "—"}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">OFFICE EMAIL</p>
-                <p className="ud__itemValue">{user.education.officeEmail}</p>
+                <p className="ud__itemValue">
+                  {user.education?.officeEmail || "—"}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">MONTHLY INCOME</p>
-                <p className="ud__itemValue">{user.education.monthlyIncome}</p>
+                <p className="ud__itemValue">
+                  {formatRange(user.education?.monthlyIncome)}
+                </p>
               </div>
 
               <div className="ud__item">
                 <p className="ud__itemLabel">LOAN REPAYMENT</p>
-                <p className="ud__itemValue">{user.education.loanRepayment}</p>
+                <p className="ud__itemValue">
+                  {formatMoney(user.education?.loanRepayment)}
+                </p>
               </div>
             </div>
           </section>
 
+          {/* Socials */}
           <section className="ud__section">
             <h2 className="ud__sectionTitle">Socials</h2>
 
             <div className="ud__grid">
               <div className="ud__item">
                 <p className="ud__itemLabel">TWITTER</p>
-                <p className="ud__itemValue">{user.socials.twitter}</p>
+                <p className="ud__itemValue">{user.socials?.twitter || "—"}</p>
               </div>
               <div className="ud__item">
                 <p className="ud__itemLabel">FACEBOOK</p>
-                <p className="ud__itemValue">{user.socials.facebook}</p>
+                <p className="ud__itemValue">{user.socials?.facebook || "—"}</p>
               </div>
               <div className="ud__item">
                 <p className="ud__itemLabel">INSTAGRAM</p>
-                <p className="ud__itemValue">{user.socials.instagram}</p>
+                <p className="ud__itemValue">
+                  {user.socials?.instagram || "—"}
+                </p>
               </div>
             </div>
           </section>
 
+          {/* Guarantor */}
           <section className="ud__section">
-            <h2 className="ud__sectionTitle">Guarantor</h2>
+  <h2 className="ud__sectionTitle">Guarantor</h2>
 
-            <div className="ud__grid">
-              <div className="ud__item">
-                <p className="ud__itemLabel">FULL NAME</p>
-                <p className="ud__itemValue">{user.guarantor.fullName}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">PHONE NUMBER</p>
-                <p className="ud__itemValue">{user.guarantor.phone}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">EMAIL ADDRESS</p>
-                <p className="ud__itemValue">{user.guarantor.email}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">RELATIONSHIP</p>
-                <p className="ud__itemValue">{user.guarantor.relationship}</p>
-              </div>
-            </div>
-          </section>
-          <section className="ud__section">
-            <h2 className="ud__sectionTitle"></h2>
+  {(user.guarantors?.length ? user.guarantors : []).map((g, idx) => {
+    const gName = `${g.firstName ?? ""} ${g.lastName ?? ""}`.trim();
 
-            <div className="ud__grid">
-              <div className="ud__item">
-                <p className="ud__itemLabel">FULL NAME</p>
-                <p className="ud__itemValue">{user.guarantor.fullName}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">PHONE NUMBER</p>
-                <p className="ud__itemValue">{user.guarantor.phone}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">EMAIL ADDRESS</p>
-                <p className="ud__itemValue">{user.guarantor.email}</p>
-              </div>
-              <div className="ud__item">
-                <p className="ud__itemLabel">RELATIONSHIP</p>
-                <p className="ud__itemValue">{user.guarantor.relationship}</p>
-              </div>
-            </div>
-          </section>
+    return (
+      <div key={idx} className={idx > 0 ? "ud__guarantorBlock" : ""}>
+        <div className="ud__grid">
+          <div className="ud__item">
+            <p className="ud__itemLabel">FULL NAME</p>
+            <p className="ud__itemValue">{gName || "—"}</p>
+          </div>
+
+          <div className="ud__item">
+            <p className="ud__itemLabel">PHONE NUMBER</p>
+            <p className="ud__itemValue">{g.phoneNumber || "—"}</p>
+          </div>
+
+          <div className="ud__item">
+            <p className="ud__itemLabel">EMAIL ADDRESS</p>
+            <p className="ud__itemValue">{g.email || "—"}</p>
+          </div>
+
+          <div className="ud__item">
+            <p className="ud__itemLabel">RELATIONSHIP</p>
+            <p className="ud__itemValue">{g.relationship || "—"}</p>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</section>
+
         </div>
       ) : (
         <div className="ud__empty">

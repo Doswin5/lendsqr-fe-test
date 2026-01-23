@@ -1,22 +1,70 @@
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { User, UserStatus } from "../../types/user";
+import { api } from "../../lib/api";
 import UsersFilter from "../../components/UsersFilter/UsersFilter";
 import Pagination from "../../components/Pagination/Pagination.tsx";
 import "./Users.scss";
 import UsersActions from "../../components/UsersActions/UsersActions.tsx";
-
-const mockTotal = 100; // for now, match Figma
+import { useUsers } from "../../hooks/useUsers";
+import { useUserStats } from "../../hooks/useUserStats";
 
 const Users = () => {
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(100);
+  const [pageSize, setPageSize] = useState(10);
   const [showFilter, setShowFilter] = useState(false);
   const [openAction, setOpenAction] = useState<string | null>(null);
+  const { users: pageUsers, total, loading, error } = useUsers(page, pageSize);
+  const {
+    total: totalUsers,
+    active: activeUsers,
+    loans: loansUsers,
+    savings: savingsUsers,
+    refresh: refreshStats,
+  } = useUserStats();
+  const [rows, setRows] = useState<User[]>([]);
 
-  // later you'll slice actual data:
-  const total = useMemo(() => mockTotal, []);
+  
+
+  useEffect(() => {
+    setRows(Array.isArray(pageUsers) ? pageUsers : []);
+  }, [pageUsers]);
+
+  const toStatus = (s: any): UserStatus => {
+    const v = String(s ?? "").toLowerCase();
+    if (
+      v === "active" ||
+      v === "inactive" ||
+      v === "pending" ||
+      v === "blacklisted"
+    )
+      return v;
+    return "inactive";
+  };
+
+  const updateUserStatus = async (id: string, status: UserStatus) => {
+    setRows((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
+
+    try {
+      await api<User>(`/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+
+      refreshStats();
+    } catch (e) {
+       
+      setRows(Array.isArray(pageUsers) ? pageUsers : []);
+    }
+  };
+
+  const statusLabelMap: Record<UserStatus, string> = {
+    active: "Active",
+    inactive: "Inactive",
+    pending: "Pending",
+    blacklisted: "Blacklisted",
+  };
 
   const filterRef = useRef<HTMLDivElement | null>(null);
-  const actionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -29,17 +77,6 @@ const Users = () => {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  useEffect(() => {
-    const onMouseDown = (e: MouseEvent) => {
-      if (actionRef.current && !actionRef.current.contains(e.target as Node)) {
-        setOpenAction(null);
-      }
-    };
-
-    document.addEventListener("mousedown", onMouseDown);
-    return () => document.removeEventListener("mousedown", onMouseDown);
-  }, []);
-
   return (
     <div className="users" onMouseDown={() => setOpenAction(null)}>
       <h1 className="users__title">Users</h1>
@@ -50,7 +87,7 @@ const Users = () => {
             <img src="/dashboardUsers-icon.svg" alt="" />
           </div>
           <p className="users__statLabel">USERS</p>
-          <p className="users__statValue">2,453</p>
+          <p className="users__statValue">{totalUsers}</p>
         </div>
 
         <div className="users__stat">
@@ -58,7 +95,7 @@ const Users = () => {
             <img src="/dashboardUsers2-icon.svg" alt="" />
           </div>
           <p className="users__statLabel">ACTIVE USERS</p>
-          <p className="users__statValue">2,453</p>
+          <p className="users__statValue">{activeUsers}</p>
         </div>
 
         <div className="users__stat">
@@ -66,7 +103,7 @@ const Users = () => {
             <img src="/dashboardUsers3-icon.svg" alt="" />
           </div>
           <p className="users__statLabel">USERS WITH LOANS</p>
-          <p className="users__statValue">12,453</p>
+          <p className="users__statValue">{loansUsers}</p>
         </div>
 
         <div className="users__stat">
@@ -74,7 +111,7 @@ const Users = () => {
             <img src="/dashboardUsers4-icon.svg" alt="" />
           </div>
           <p className="users__statLabel">USERS WITH SAVINGS</p>
-          <p className="users__statValue">102,453</p>
+          <p className="users__statValue">{savingsUsers}</p>
         </div>
       </div>
 
@@ -148,141 +185,62 @@ const Users = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Lendsqr</td>
-              <td>Adedeji</td>
-              <td>adedeji@lendsqr.com</td>
-              <td>08078903721</td>
-              <td>May 15, 2020 10:00 AM</td>
-              <td>
-                <span className="status status--inactive">Inactive</span>
-              </td>
-              <td className="users__actions">
-                <div ref={actionRef} className="users__actionsWrap">
-                  <button
-                    className="users__actionsBtn"
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setOpenAction(openAction === "1" ? null : "1");
-                    }}
-                  >
-                    ⋮
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan={7}>Loading...</td>
+              </tr>
+            ) : null}
+            {error ? (
+              <tr>
+                <td colSpan={7}>{error}</td>
+              </tr>
+            ) : null}
+            {(Array.isArray(rows) ? rows : [])?.map((u) => {
+              const status = toStatus(u.status);
 
-                  {openAction === "1" && (
-                    <div onMouseDown={(e) => e.stopPropagation()}>
-                      <UsersActions
-                        userId={"1"}
-                        onClose={() => setOpenAction(null)}
-                      />
+              return (
+                <tr key={u.id}>
+                  <td>{u.orgName}</td>
+                  <td>{u.userName}</td>
+                  <td>{u.email}</td>
+                  <td>{u.phoneNumber}</td>
+                  <td>{new Date(u.createdAt).toLocaleString()}</td>
+                  <td>
+                    <span className={`status status--${status}`}>
+                      {statusLabelMap[status]}
+                    </span>
+                  </td>
+                  <td className="users__actions">
+                    <div className="users__actionsWrap">
+                      <button
+                        className="users__actionsBtn"
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          setOpenAction(openAction === u.id ? null : u.id);
+                        }}
+                      >
+                        ⋮
+                      </button>
+
+                      {openAction === u.id && (
+                        <div onMouseDown={(e) => e.stopPropagation()}>
+                          <UsersActions
+                            userId={u.id}
+                            status={status}
+                            onActivate={() => updateUserStatus(u.id, "active")}
+                            onBlacklist={() =>
+                              updateUserStatus(u.id, "blacklisted")
+                            }
+                            onClose={() => setOpenAction(null)}
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Irorun</td>
-              <td>Debby Ogana</td>
-              <td>debby2@irorun.com</td>
-              <td>08160780928</td>
-              <td>Apr 30, 2020 10:00 AM</td>
-              <td>
-                <span className="status status--pending">Pending</span>
-              </td>
-              <td className="users__actions">
-                <div ref={actionRef} className="users__actionsWrap">
-                  <button
-                    className="users__actionsBtn"
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setOpenAction(openAction === "2" ? null : "2");
-                    }}
-                  >
-                    ⋮
-                  </button>
-
-                  {openAction === "2" && (
-                    <div onMouseDown={(e) => e.stopPropagation()}>
-                      <UsersActions
-                        userId={"2"}
-                        onClose={() => setOpenAction(null)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Lendstar</td>
-              <td>Grace Effiom</td>
-              <td>grace@lendstar.com</td>
-              <td>07060780922</td>
-              <td>Apr 30, 2020 10:00 AM</td>
-              <td>
-                <span className="status status--blacklisted">Blacklisted</span>
-              </td>
-              <td className="users__actions">
-                <div ref={actionRef} className="users__actionsWrap">
-                  <button
-                    className="users__actionsBtn"
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setOpenAction(openAction === "3" ? null : "3");
-                    }}
-                  >
-                    ⋮
-                  </button>
-
-                  {openAction === "3" && (
-                    <div onMouseDown={(e) => e.stopPropagation()}>
-                      <UsersActions
-                        userId={"3"}
-                        onClose={() => setOpenAction(null)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td>Lendsqr</td>
-              <td>Tosin Dokunmu</td>
-              <td>tosin@lendsqr.com</td>
-              <td>07003309226</td>
-              <td>Apr 10, 2020 10:00 AM</td>
-              <td>
-                <span className="status status--active">Active</span>
-              </td>
-              <td className="users__actions">
-                <div ref={actionRef} className="users__actionsWrap">
-                  <button
-                    className="users__actionsBtn"
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setOpenAction(openAction === "4" ? null : "4");
-                    }}
-                  >
-                    ⋮
-                  </button>
-
-                  {openAction === "4" && (
-                    <div onMouseDown={(e) => e.stopPropagation()}>
-                      <UsersActions
-                        userId={"4"}
-                        onClose={() => setOpenAction(null)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </td>
-            </tr>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

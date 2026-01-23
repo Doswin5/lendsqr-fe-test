@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./Pagination.scss";
 
 type Props = {
@@ -12,8 +13,11 @@ const PAGE_SIZES = [10, 20, 50, 100];
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 
+
+
+
 const getPages = (current: number, totalPages: number) => {
-  // Figma-like: 1 2 3 ... 15 16 (example). Keep it simple.
+  
   const pages: (number | "...")[] = [];
 
   if (totalPages <= 7) {
@@ -46,6 +50,11 @@ const Pagination = ({ total, page, pageSize, onPageChange, onPageSizeChange }: P
 
   const start = total === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const end = Math.min(total, safePage * pageSize);
+
+  useEffect(() => {
+  if (page !== safePage) onPageChange(safePage);
+}, [page, safePage, onPageChange]);
+
 
   return (
     <div className="pagination">
